@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本語クイズ (31問 - 漢字とひらがな)</title>
+    <title>日本語クイズ 統合版 (セッション1 → セッション2)</title>
     <style>
         body {
             font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
@@ -21,8 +21,8 @@
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 600px;
+            width: 95%;
+            max-width: 700px;
             padding: 25px;
             text-align: center;
         }
@@ -36,9 +36,35 @@
         .progress {
             font-size: 14px;
             color: #7f8c8d;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
+        /* Timer Styling */
+        .timer-container {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+
+        .timer-container.warning {
+            color: #e67e22;
+            animation: pulse 1s infinite;
+        }
+
+        .timer-container.danger {
+            color: #c0392b;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Sesi 1: Gambar */
         .image-container {
             width: 100%;
             height: 280px;
@@ -47,7 +73,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             overflow: hidden;
             border: 1px solid #eee;
         }
@@ -58,60 +84,140 @@
             object-fit: contain;
         }
 
-        .options {
+        /* Sesi 2: Kata Indonesia */
+        .question-box {
+            width: 100%;
+            min-height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .option-btn {
-            background-color: #ecf0f1;
-            border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            padding: 12px 15px;
+        .question-box .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .question-box .indonesian-word {
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .question-box .hint {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .instruction-text {
             font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        /* Transisi Sesi */
+        .session-transition {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .session-transition.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .session-transition h2 {
             color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .session-transition p {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .continue-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 18px;
+            cursor: pointer;
             font-family: inherit;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .continue-btn:hover {
+            background-color: #219150;
+        }
+
+        /* Layar Skor / Rekap */
+        .score-container { display: none; }
+        .score-container h2 { color: #2c3e50; margin-bottom: 5px;}
+        .score-text { font-size: 18px; margin: 10px 0 20px 0; }
+
+        .recap-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .recap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .recap-table th {
+            background-color: #34495e;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .recap-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
             text-align: left;
         }
 
-        .option-btn:hover:not(:disabled) {
-            background-color: #d5dbdb;
-            border-color: #95a5a6;
+        .recap-table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
-        .option-btn.correct {
-            background-color: #2ecc71;
-            border-color: #27ae60;
-            color: white;
+        .recap-table img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 4px;
+            background-color: #fff;
         }
 
-        .option-btn.wrong {
-            background-color: #e74c3c;
-            border-color: #c0392b;
-            color: white;
-        }
-
-        .option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.85;
-        }
-
-        .feedback {
-            margin-top: 15px;
+        .recap-table .answer {
             font-weight: bold;
-            font-size: 18px;
-            height: 25px;
+            color: #27ae60;
         }
-
-        .feedback.correct { color: #27ae60; }
-        .feedback.wrong { color: #c0392b; }
-
-        .score-container { display: none; }
-        .score-container h2 { color: #2c3e50; }
-        .score-text { font-size: 20px; margin: 20px 0; }
         
         .restart-btn {
             background-color: #e67e22;
@@ -125,120 +231,191 @@
             font-family: inherit;
         }
         .restart-btn:hover { background-color: #d35400; }
+
+        /* Badge Sesi */
+        .session-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .badge-1 { background-color: #3498db; color: white; }
+        .badge-2 { background-color: #9b59b6; color: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
     <div class="quiz-container">
-        <h1 id="quiz-title">日本語クイズ</h1>
+        <h1 id="quiz-title">日本語クイズ 統合版</h1>
         
         <div id="question-area">
+            <div id="session-badge-container"></div>
             <div class="progress" id="progress-text"></div>
-            <div class="image-container" id="image-container"></div>
-            <div class="options" id="options-container"></div>
-            <div class="feedback" id="feedback-text"></div>
+            <div class="timer-container" id="timer-display">10</div>
+            
+            <!-- Area Sesi 1 (Gambar) -->
+            <div id="area-sesi-1" style="display: none;">
+                <div class="image-container" id="image-container"></div>
+            </div>
+
+            <!-- Area Sesi 2 (Kata Indonesia) -->
+            <div id="area-sesi-2" style="display: none;">
+                <div class="question-box">
+                    <div class="label">インドネシア語</div>
+                    <div class="indonesian-word" id="indonesian-word"></div>
+                    <div class="hint">日本語で書いてください</div>
+                </div>
+            </div>
+            
+            <div class="instruction-text" id="instruction-text">紙に答えを書いてください (Tulis jawaban di kertas)</div>
         </div>
 
+        <!-- Layar Transisi Antar Sesi -->
+        <div class="session-transition" id="session-transition">
+            <h2>セッション1 終了！</h2>
+            <p>お疲れ様でした！<br>次はセッション2（言葉）です。<br>紙とペンを準備してください。</p>
+            <button class="continue-btn" onclick="startSession2()">セッション2 を始める</button>
+        </div>
+
+        <!-- Layar Skor & Rekap -->
         <div class="score-container" id="score-container">
-            <h2>クイズ終了！</h2>
-            <div class="score-text">あなたのスコア: <strong><span id="final-score"></span> / <span id="total-score-display"></span></strong></div>
-            <p id="score-message"></p>
+            <h2>全試験終了！</h2>
+            <div class="score-text">全 <span id="total-questions"></span> 問が終了しました。<br>下の表を見て、紙に書いた答えを確認してください。</div>
+            
+            <div class="recap-table-container">
+                <table class="recap-table" id="recap-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>問題</th>
+                            <th>正しい答え</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recap-tbody">
+                        <!-- Diisi oleh JS -->
+                    </tbody>
+                </table>
+            </div>
+
             <button class="restart-btn" onclick="restartQuiz()">もう一度挑戦する</button>
         </div>
     </div>
 
     <script>
-        // Data kuis berdasarkan daftar kosakata yang Anda berikan
-        // Semua jawaban sudah menggunakan Kanji (Hiragana)
-        // PERBAIKAN: Menambahkan koma yang hilang dan menutup kurung kurawal yang belum tertutup.
+        // ============================================================
+        // DATA
+        // ============================================================
         
-       const originalQuizData = [
-    // 1. 拾います (Memungut) -> gambaranak memungut sampah
-    { image: "gambar1.png", options: ["拾います (ひろいます)", "捨てます (すてます)", "拭きます (ふきます)", "曲がります (まがります)"], correct: "拾います (ひろいます)" },
-    // 2. 卵 (Telur) -> gambartelur
-    { image: "gambar2.png", options: ["卵 (たまご)", "野菜 (やさい)", "魚 (さかな)", "肉 (にく)"], correct: "卵 (たまご)" },
-    // 3. 学生 (Siswa) -> gambaranak belajar
-    { image: "gambar3.png", options: ["学生 (がくせい)", "先生 (せんせい)", "医者 (いしゃ)", "介護職 (かいごしょく)"], correct: "学生 (がくせい)" },
-    // 4. 案内します (Memandu) -> gambarpemandu wisata
-    { image: "gambar4.png", options: ["案内します (あんないします)", "走ります (はしります)", "歩きます (あるきます)", "助けます (たすけます)"], correct: "案内します (あんないします)" },
-    // 5. 父 (Ayah) -> gambarsilsilah keluarga (ayah)
-    { image: "gambar5.png", options: ["父 (ちち)", "母 (はは)", "兄 (あに)", "弟 (おとうと)"], correct: "父 (ちち)" },
-    // 6. 紙 (Kertas) -> gambartumpukan kertas
-    { image: "gambar6.png", options: ["紙 (かみ)", "本 (ほん)", "ノート", "鉛筆 (えんぴつ)"], correct: "紙 (かみ)" },
-    // 7. 被ります (Memakai topi) -> gambaranak pakai topi
-    { image: "gambar7.png", options: ["被ります (かぶります)", "着ます (きます)", "履きます (はきます)", "掛けます (かけます)"], correct: "被ります (かぶります)" },
-    // 8. バス (Bus) -> gambarbus
-    { image: "gambar8.png", options: ["バス", "電車 (でんしゃ)", "車 (くるま)", "飛行機 (ひこうき)"], correct: "バス" },
-    // 9. 酸っぱい (Asam) -> gambarmakan lemon
-    { image: "gambar9.png", options: ["酸っぱい (すっぱい)", "甘い (あまい)", "辛い (からい)", "苦い (にがい)"], correct: "酸っぱい (すっぱい)" },
-    // 10. 子供 (Anak) -> gambaranak laki-laki
-    { image: "gambar10.png", options: ["子供 (こども)", "大人 (おとな)", "おじいさん", "おばあさん"], correct: "子供 (こども)" },
-    // 11. 曲がります (Berbelok) -> gambarpanah berbelok
-    { image: "gambar11.png", options: ["曲がります (まがります)", "進みます (すすみます)", "止まります (とまります)", "走ります (はしります)"], correct: "曲がります (まがります)" },
-    // 12. 鍵 (Kunci) -> gambarkunci
-    { image: "gambar12.png", options: ["鍵 (かぎ)", "時計 (とけい)", "鉛筆 (えんぴつ)", "紙 (かみ)"], correct: "鍵 (かぎ)" },
-    // 13. トイレ (Toilet) -> gambartoilet
-    { image: "gambar13.png", options: ["トイレ", "お風呂 (おふろ)", "台所 (だいどころ)", "玄関 (げんかん)"], correct: "トイレ" },
-    // 14. 拭きます (Mengelap) -> gambarmembersihkan meja
-    { image: "gambar14.png", options: ["拭きます (ふきます)", "洗います (あらいます)", "掃きます (はきます)", "磨きます (みがきます)"], correct: "拭きます (ふきます)" },
-    // 15. 丸い (Bulat) -> gambarban
-    { image: "gambar15.png", options: ["丸い (まるい)", "四角い (しかくい)", "長い (ながい)", "短い (みじかい)"], correct: "丸い (まるい)" },
-    // 16. 貼ります (Menempel) -> gambarmemasang wallpaper
-    { image: "gambar16.png", options: ["貼ります (はります)", "塗ります (ぬります)", "切ります (きります)", "描きます (かきます)"], correct: "貼ります (はります)" },
-    // 17. 帽子 (Topi) -> gambartopi bunga
-    { image: "gambar17.png", options: ["帽子 (ぼうし)", "リボン", "ボタン", "羽 (はね)"], correct: "帽子 (ぼうし)" },
-    // 18. 掃除機 (Vacuum cleaner) -> gambarvacuum
-    { image: "gambar18.png", options: ["掃除機 (そうじき)", "扇風機 (せんぷうき)", "冷蔵庫 (れいぞうこ)", "テレビ"], correct: "掃除機 (そうじき)" },
-    // 19. 歩きます (Berjalan) -> gambarorang berjalan
-    { image: "gambar19.png", options: ["歩きます (あるきます)", "走ります (はしります)", "座ります (すわります)", "飛びます (とびます)"], correct: "歩きます (あるきます)" },
-    // 20. 生まれます (Lahir) -> gambarkeluarga dengan bayi
-    { image: "gambar20.png", options: ["生まれます (うまれます)", "死にます (しにます)", "育ちます (そだちます)", "笑います (わらいます)"], correct: "生まれます (うまれます)" },
-    // 21. 汚れます (Kotor) -> gambarkaos kotor
-    { image: "gambar21.png", options: ["汚れます (よごれます)", "綺麗になります (きれいになります)", "新しくなります (あたらしくなります)", "古くなります (ふるくなります)"], correct: "汚れます (よごれます)" },
-    // 22. ハンカチ (Saputangan) -> gambarsaputangan
-    { image: "gambar22.png", options: ["ハンカチ", "タオル", "シャツ", "ズボン"], correct: "ハンカチ" },
-    // 23. 助けます (Menolong) -> gambarpenyelamatan di sungai
-    { image: "gambar23.png", options: ["助けます (たすけます)", "溺れます (おぼれます)", "泳ぎます (およぎます)", "起きます (おきます)"], correct: "助けます (たすけます)" },
-    // 24. 公園 (Taman) -> gambartaman
-    { image: "gambar24.png", options: ["公園 (こうえん)", "学校 (がっこう)", "病院 (びょういん)", "駅 (えき)"], correct: "公園 (こうえん)" },
-    // 25. 広い (Luas) -> gambarruang tamu
-    { image: "gambar25.png", options: ["広い (ひろい)", "狭い (せまい)", "高い (たかい)", "低い (ひくい)"], correct: "広い (ひろい)" },
-    // 26. 晴れ (Cerah) -> gambartaman (langit cerah)
-    { image: "gambar26.png", options: ["晴れ (はれ)", "雨 (あめ)", "曇り (くもり)", "雪 (ゆき)"], correct: "晴れ (はれ)" },
-    // 27. 妻 (Istri) -> gambarsilsilah keluarga (ibu)
-    { image: "gambar27.png", options: ["妻 (つま)", "夫 (おっと)", "姉 (あね)", "妹 (いもうと)"], correct: "妻 (つま)" },
-    // 28. 飛行機 (Pesawat) -> Pesawat
-    { image: "gambar28.png", options: ["飛行機 (ひこうき)", "船 (ふね)", "車 (くるま)", "自転車 (じてんしゃ)"], correct: "飛行機 (ひこうき)" },
-    // 29. 結婚 (Pernikahan) -> gambarsaputangan
-    { image: "gambar29.png", options: ["結婚 (けっこん)", "卒業 (そつぎょう)", "合格 (ごうかく)", "会議 (かいぎ)"], correct: "結婚 (けっこん)" },
-    // 30. コンビニ (Minimarket) -> gambarMinimarket
-    { image: "gambar30.png", options: ["コンビニ", "図書館 (としょかん)", "銀行 (ぎんこう)", "郵便局 (ゆうびんきょく)"], correct: "コンビニ" },
-    // 31. 止めます (Mematikan) -> 
-    { image: "gambar31.png", options: ["止めます (とめます)", "開けます (あけます)", "洗います (あらいます)", "聞きます (ききます)"], correct: "止めます (とめます)" },
-    // 32. 両親 (りょうしん) -> 
-    { image: "gambar32.png", options: ["両親 (りょうしん)", "近所 (きんじょ)", "友達 (ともだち)", "利用者 (りようしゃ)"], correct: "両親 (りょうしん)" },
-    // 33. 家族 (かぞく) -> 
-    { image: "gambar33.png", options: ["家族 (かぞく)", "近所 (きんじょ)", "友達 (ともだち)", "利用者 (りようしゃ)"], correct: "家族 (かぞく)" },
-    // 34. 調べます (Meneliti/Memeriksa) -> 
-    { image: "gambar34.png", options: ["調べます (しらべます)", "知ります (しります)", "忘れます (わすれます)", "覚えます (おぼえます)"], correct: "調べます (しらべます)" }
-];
+        // Data Sesi 1 (Gambar)
+        const session1Data = [
+            { type: 'image', image: "gambar1.png", correct: "拾います (ひろいます)" },
+            { type: 'image', image: "gambar2.png", correct: "卵 (たまご)" },
+            { type: 'image', image: "gambar3.png", correct: "学生 (がくせい)" },
+            { type: 'image', image: "gambar4.png", correct: "案内します (あんないします)" },
+            { type: 'image', image: "gambar5.png", correct: "父 (ちち)" },
+            { type: 'image', image: "gambar6.png", correct: "紙 (かみ)" },
+            { type: 'image', image: "gambar7.png", correct: "被ります (かぶります)" },
+            { type: 'image', image: "gambar8.png", correct: "バス" },
+            { type: 'image', image: "gambar9.png", correct: "酸っぱい (すっぱい)" },
+            { type: 'image', image: "gambar10.png", correct: "子供 (こども)" },
+            { type: 'image', image: "gambar11.png", correct: "曲がります (まがります)" },
+            { type: 'image', image: "gambar12.png", correct: "鍵 (かぎ)" },
+            { type: 'image', image: "gambar13.png", correct: "トイレ" },
+            { type: 'image', image: "gambar14.png", correct: "拭きます (ふきます)" },
+            { type: 'image', image: "gambar15.png", correct: "丸い (まるい)" },
+            { type: 'image', image: "gambar16.png", correct: "貼ります (はります)" },
+            { type: 'image', image: "gambar17.png", correct: "帽子 (ぼうし)" },
+            { type: 'image', image: "gambar18.png", correct: "掃除機 (そうじき)" },
+            { type: 'image', image: "gambar19.png", correct: "歩きます (あるきます)" },
+            { type: 'image', image: "gambar20.png", correct: "生まれます (うまれます)" },
+            { type: 'image', image: "gambar21.png", correct: "汚れます (よごれます)" },
+            { type: 'image', image: "gambar22.png", correct: "ハンカチ" },
+            { type: 'image', image: "gambar23.png", correct: "助けます (たすけます)" },
+            { type: 'image', image: "gambar24.png", correct: "公園 (こうえん)" },
+            { type: 'image', image: "gambar25.png", correct: "広い (ひろい)" },
+            { type: 'image', image: "gambar26.png", correct: "晴れ (はれ)" },
+            { type: 'image', image: "gambar27.png", correct: "妻 (つま)" },
+            { type: 'image', image: "gambar28.png", correct: "飛行機 (ひこうき)" },
+            { type: 'image', image: "gambar29.png", correct: "結婚 (けっこん)" },
+            { type: 'image', image: "gambar30.png", correct: "コンビニ" },
+            { type: 'image', image: "gambar31.png", correct: "止めます (とめます)" },
+            { type: 'image', image: "gambar32.png", correct: "両親 (りょうしん)" },
+            { type: 'image', image: "gambar33.png", correct: "家族 (かぞく)" },
+            { type: 'image', image: "gambar34.png", correct: "調べます (しらべます)" }
+        ];
 
-        let quizData = [];
+        // Data Sesi 2 (Kata Indonesia)
+        const session2Data = [
+            { type: 'text', indonesian: "Telur", correct: "卵 (たまご)" },
+            { type: 'text', indonesian: "Kertas", correct: "紙 (かみ)" },
+            { type: 'text', indonesian: "Kunci", correct: "鍵 (かぎ)" },
+            { type: 'text', indonesian: "Toilet", correct: "トイレ" },
+            { type: 'text', indonesian: "Topi", correct: "帽子 (ぼうし)" },
+            { type: 'text', indonesian: "Vacuum cleaner", correct: "掃除機 (そうじき)" },
+            { type: 'text', indonesian: "Saputangan", correct: "ハンカチ" },
+            { type: 'text', indonesian: "Taman", correct: "公園 (こうえん)" },
+            { type: 'text', indonesian: "Pesawat", correct: "飛行機 (ひこうき)" },
+            { type: 'text', indonesian: "Minimarket", correct: "コンビニ" },
+            { type: 'text', indonesian: "Memungut", correct: "拾います (ひろいます)" },
+            { type: 'text', indonesian: "Memandu", correct: "案内します (あんないします)" },
+            { type: 'text', indonesian: "Memakai topi", correct: "被ります (かぶります)" },
+            { type: 'text', indonesian: "Mengelap", correct: "拭きます (ふきます)" },
+            { type: 'text', indonesian: "Menempel", correct: "貼ります (はります)" },
+            { type: 'text', indonesian: "Berjalan", correct: "歩きます (あるきます)" },
+            { type: 'text', indonesian: "Lahir", correct: "生まれます (うまれます)" },
+            { type: 'text', indonesian: "Kotor", correct: "汚れます (よごれます)" },
+            { type: 'text', indonesian: "Menolong", correct: "助けます (たすけます)" },
+            { type: 'text', indonesian: "Berbelok", correct: "曲がります (まがります)" },
+            { type: 'text', indonesian: "Mematikan", correct: "止めます (とめます)" },
+            { type: 'text', indonesian: "Meneliti/Memeriksa", correct: "調べます (しらべます)" },
+            { type: 'text', indonesian: "Asam", correct: "酸っぱい (すっぱい)" },
+            { type: 'text', indonesian: "Bulat", correct: "丸い (まるい)" },
+            { type: 'text', indonesian: "Luas", correct: "広い (ひろい)" },
+            { type: 'text', indonesian: "Cerah", correct: "晴れ (はれ)" },
+            { type: 'text', indonesian: "Ayah", correct: "父 (ちち)" },
+            { type: 'text', indonesian: "Istri", correct: "妻 (つま)" },
+            { type: 'text', indonesian: "Anak-anak", correct: "子供 (こども)" },
+            { type: 'text', indonesian: "Siswa", correct: "学生 (がくせい)" },
+            { type: 'text', indonesian: "Bus", correct: "バス" },
+            { type: 'text', indonesian: "Pernikahan", correct: "結婚 (けっこん)" },
+            { type: 'text', indonesian: "Orang tua", correct: "両親 (りょうしん)" },
+            { type: 'text', indonesian: "Keluarga", correct: "家族 (かぞく)" }
+        ];
+
+        // ============================================================
+        // LOGIKA KUIS
+        // ============================================================
+        const TIMER_DURATION = 10; // 10 detik per soal
+
+        let quizData = [];           // Soal yang sedang aktif
         let currentQuestionIndex = 0;
-        let score = 0;
-        let answered = false;
-        let autoNextTimer = null;
+        let timerInterval = null;
+        let timeLeft = TIMER_DURATION;
+        let currentSession = 1;      // 1 atau 2
 
-        const imageContainer = document.getElementById('image-container');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackEl = document.getElementById('feedback-text');
         const questionArea = document.getElementById('question-area');
+        const sessionTransition = document.getElementById('session-transition');
         const scoreContainer = document.getElementById('score-container');
-        const finalScoreEl = document.getElementById('final-score');
-        const totalScoreDisplay = document.getElementById('total-score-display');
         const quizTitle = document.getElementById('quiz-title');
         const progressText = document.getElementById('progress-text');
-        const scoreMessage = document.getElementById('score-message');
+        const timerDisplay = document.getElementById('timer-display');
+        
+        const areaSesi1 = document.getElementById('area-sesi-1');
+        const areaSesi2 = document.getElementById('area-sesi-2');
+        const imageContainer = document.getElementById('image-container');
+        const indonesianWord = document.getElementById('indonesian-word');
+        const sessionBadgeContainer = document.getElementById('session-badge-container');
+        const instructionText = document.getElementById('instruction-text');
+        
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const recapTbody = document.getElementById('recap-tbody');
 
         function shuffleArray(array) {
             const shuffled = [...array];
@@ -249,108 +426,166 @@
             return shuffled;
         }
 
-        function prepareQuiz() {
-            const shuffledQuestions = shuffleArray(originalQuizData);
-            quizData = shuffledQuestions.map(q => {
-                return {
-                    image: q.image,
-                    options: shuffleArray(q.options),
-                    correct: q.correct 
-                };
-            });
-        }
-
-        function loadQuestion() {
-            answered = false;
-            clearTimeout(autoNextTimer);
-            
-            feedbackEl.textContent = "";
-            feedbackEl.className = "feedback";
-            optionsContainer.innerHTML = "";
-
-            const currentQuizData = quizData[currentQuestionIndex];
-            
-            imageContainer.innerHTML = `<img src="${currentQuizData.image}" alt="問題の画像" onerror="this.src='https://via.placeholder.com/400x280?text=Gambar+tidak+ditemukan'">`;
-            
-            progressText.textContent = `第 ${currentQuestionIndex + 1} 問 / ${quizData.length} 問`;
-
-            currentQuizData.options.forEach((option) => {
-                const button = document.createElement('button');
-                button.innerText = option;
-                button.classList.add('option-btn');
-                button.onclick = () => selectOption(option, button);
-                optionsContainer.appendChild(button);
-            });
-        }
-
-        function selectOption(selectedOption, selectedButton) {
-            if (answered) return;
-            
-            const currentQuizData = quizData[currentQuestionIndex];
-            const allButtons = optionsContainer.querySelectorAll('.option-btn');
-            
-            allButtons.forEach(btn => btn.disabled = true);
-            
-            if (selectedOption === currentQuizData.correct) {
-                selectedButton.classList.add('correct');
-                feedbackEl.textContent = "正解！";
-                feedbackEl.classList.add('correct');
-                score++;
-            } else {
-                selectedButton.classList.add('wrong');
-                allButtons.forEach(btn => {
-                    if (btn.innerText === currentQuizData.correct) {
-                        btn.classList.add('correct');
-                    }
-                });
-                feedbackEl.textContent = "残念！";
-                feedbackEl.classList.add('wrong');
-            }
-
-            answered = true;
-
-            autoNextTimer = setTimeout(() => {
-                currentQuestionIndex++;
-                if (currentQuestionIndex < quizData.length) {
-                    loadQuestion();
-                } else {
-                    showScore();
-                }
-            }, 1500); 
-        }
-
-        function showScore() {
-            questionArea.style.display = "none";
-            scoreContainer.style.display = "block";
-            quizTitle.textContent = "結果発表";
-            finalScoreEl.textContent = score;
-            totalScoreDisplay.textContent = quizData.length;
-            
-            const percentage = (score / quizData.length) * 100;
-            if (percentage === 100) {
-                scoreMessage.textContent = "完璧です！素晴らしい！";
-            } else if (percentage >= 80) {
-                scoreMessage.textContent = "よくできました！";
-            } else if (percentage >= 60) {
-                scoreMessage.textContent = "合格です！もう少し頑張りましょう。";
-            } else {
-                scoreMessage.textContent = "もう一度復習しましょう。";
-            }
-        }
-
-        function restartQuiz() {
+        // Memulai Sesi 1
+        function startSession1() {
+            currentSession = 1;
+            quizData = shuffleArray([...session1Data]); // Hanya data Sesi 1
             currentQuestionIndex = 0;
-            score = 0;
-            questionArea.style.display = "block";
-            scoreContainer.style.display = "none";
-            quizTitle.textContent = "日本語クイズ";
             
-            prepareQuiz();
+            sessionTransition.classList.remove('show');
+            scoreContainer.style.display = "none";
+            questionArea.style.display = "block";
+            quizTitle.textContent = "セッション 1 (絵)";
+            
             loadQuestion();
         }
 
-        prepareQuiz();
-        loadQuestion();
+        // Memulai Sesi 2 (dipanggil setelah Sesi 1 selesai)
+        function startSession2() {
+            currentSession = 2;
+            quizData = shuffleArray([...session2Data]); // Hanya data Sesi 2
+            currentQuestionIndex = 0;
+            
+            sessionTransition.classList.remove('show');
+            questionArea.style.display = "block";
+            quizTitle.textContent = "セッション 2 (言葉)";
+            
+            loadQuestion();
+        }
+
+        function startTimer() {
+            timeLeft = TIMER_DURATION;
+            timerDisplay.textContent = timeLeft;
+            timerDisplay.className = "timer-container";
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 3) {
+                    timerDisplay.classList.add('danger');
+                } else if (timeLeft <= 5) {
+                    timerDisplay.classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            
+            const currentQuizData = quizData[currentQuestionIndex];
+            
+            // Reset tampilan
+            areaSesi1.style.display = "none";
+            areaSesi2.style.display = "none";
+            sessionBadgeContainer.innerHTML = "";
+
+            if (currentSession === 1) {
+                // Tampilkan Sesi 1 (Gambar)
+                areaSesi1.style.display = "block";
+                sessionBadgeContainer.innerHTML = '<span class="session-badge badge-1">セッション 1 (絵)</span>';
+                imageContainer.innerHTML = `<img src="${currentQuizData.image}" alt="問題の画像" onerror="this.src='https://via.placeholder.com/400x280?text=Gambar+tidak+ditemukan'">`;
+                instructionText.textContent = "紙に答えを書いてください (Tulis jawaban di kertas)";
+            } else {
+                // Tampilkan Sesi 2 (Kata Indonesia)
+                areaSesi2.style.display = "block";
+                sessionBadgeContainer.innerHTML = '<span class="session-badge badge-2">セッション 2 (言葉)</span>';
+                indonesianWord.textContent = currentQuizData.indonesian;
+                instructionText.textContent = "紙に日本語で答えを書いてください (Tulis jawaban bahasa Jepang di kertas)";
+            }
+            
+            progressText.textContent = `第 ${currentQuestionIndex + 1} 問 / ${quizData.length} 問`;
+
+            // Mulai timer setelah jeda singkat
+            setTimeout(startTimer, 500);
+        }
+
+        function timeUp() {
+            // LANGSUNG PINDAH KE SOAL BERIKUTNYA TANPA MENAMPILKAN JAWABAN
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < quizData.length) {
+                // Masih ada soal di sesi ini
+                loadQuestion();
+            } else {
+                // Sesi ini selesai
+                if (currentSession === 1) {
+                    // Sesi 1 selesai, tampilkan layar transisi
+                    showSessionTransition();
+                } else {
+                    // Sesi 2 selesai, tampilkan rekap akhir
+                    showScore();
+                }
+            }
+        }
+
+        function showSessionTransition() {
+            clearInterval(timerInterval);
+            questionArea.style.display = "none";
+            sessionTransition.classList.add('show');
+            quizTitle.textContent = "セッション 1 終了";
+        }
+
+        function showScore() {
+            clearInterval(timerInterval);
+            questionArea.style.display = "none";
+            sessionTransition.classList.remove('show');
+            scoreContainer.style.display = "block";
+            quizTitle.textContent = "全試験終了";
+            
+            // Gabungkan data Sesi 1 dan Sesi 2 untuk rekap
+            const allData = [...session1Data, ...session2Data];
+            totalQuestionsEl.textContent = allData.length;
+
+            // Buat Tabel Rekap
+            recapTbody.innerHTML = "";
+            allData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                // Kolom No
+                const tdNo = document.createElement('td');
+                tdNo.textContent = index + 1;
+                tr.appendChild(tdNo);
+
+                // Kolom Soal (Gambar atau Teks)
+                const tdQuestion = document.createElement('td');
+                if (item.type === 'image') {
+                    tdQuestion.innerHTML = `<img src="${item.image}" alt="gambar" onerror="this.src='https://via.placeholder.com/60x60?text=?'">`;
+                } else {
+                    tdQuestion.textContent = item.indonesian;
+                }
+                tr.appendChild(tdQuestion);
+
+                // Kolom Jawaban
+                const tdAnswer = document.createElement('td');
+                tdAnswer.className = "answer";
+                tdAnswer.textContent = item.correct;
+                tr.appendChild(tdAnswer);
+
+                recapTbody.appendChild(tr);
+            });
+        }
+
+        function restartQuiz() {
+            clearInterval(timerInterval);
+            currentQuestionIndex = 0;
+            currentSession = 1;
+            
+            scoreContainer.style.display = "none";
+            sessionTransition.classList.remove('show');
+            questionArea.style.display = "block";
+            
+            startSession1();
+        }
+
+        // Inisialisasi: Mulai dari Sesi 1
+        startSession1();
     </script>
 </body>
 </html>
